@@ -1,0 +1,145 @@
+/* Page background */
+body {
+  background: linear-gradient(135deg, #eef2ff, #ffffff);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container */
+.max-w-md {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;           /* rounded-xl */
+  padding: 2rem;                 /* spacing */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 90%;
+  max-width: 420px;
+  margin: 2rem auto;
+}
+
+.max-w-md:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Headings */
+h2 {
+  color: #4f46e5; /* indigo-600 */
+  font-weight: 800;
+  text-align: center;
+  font-size: 1.875rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: #6b7280;
+  text-align: center;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Labels */
+label {
+  display: block;
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  outline: none;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 1rem;
+}
+
+input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Error message */
+.bg-red-50 {
+  border-left: 4px solid #dc2626;
+  background: #fee2e2;
+  padding: 0.75rem 1rem;
+  border-radius: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.text-red-800 {
+  color: #b91c1c !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Submit button */
+button[type="submit"] {
+  background-color: #4f46e5; /* indigo-600 */
+  color: #ffffff;
+  padding: 0.8rem 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+button[type="submit"]:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Login link */
+.text-center {
+  margin-top: 1.5rem;
+}
+
+.text-indigo-600 {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.text-indigo-600:hover {
+  text-decoration: underline;
+}
+
+/* Responsive layout */
+@media (max-width: 500px) {
+  .max-w-md {
+    padding: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    font-size: 0.9rem;
+  }
+}

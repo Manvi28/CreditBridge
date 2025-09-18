@@ -2,6 +2,19 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import './Profile.css';
+
+const defaultForm = {
+  age: '',
+  gender: '',
+  occupation: '',
+  monthlyIncome: ['', '', '', '', '', ''],
+  rentPayment: 'on-time',
+  utility1Payment: 'on-time',
+  utility2Payment: 'on-time',
+  educationLevel: '',
+  fieldOfStudy: ''
+};
 
 const Profile = () => {
   const { user } = useAuth();
@@ -9,25 +22,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
-  const [formData, setFormData] = useState({
-    // Basic profile
-    age: '',
-    gender: '',
-    occupation: '',
-    
-    // Income (last 6 months)
-    monthlyIncome: ['', '', '', '', '', ''],
-    
-    // Payment history
-    rentPayment: 'on-time',
-    utility1Payment: 'on-time',
-    utility2Payment: 'on-time',
-    
-    // Education
-    educationLevel: '',
-    fieldOfStudy: ''
-  });
+
+  const [formData, setFormData] = useState(defaultForm);
 
   useEffect(() => {
     fetchProfile();
@@ -37,7 +33,11 @@ const Profile = () => {
     try {
       const response = await axios.get('http://localhost:5000/api/profile');
       if (response.data) {
-        setFormData(response.data);
+        setFormData(prev => ({
+          ...prev,
+          ...response.data,
+          monthlyIncome: response.data.monthlyIncome || prev.monthlyIncome
+        }));
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -48,13 +48,13 @@ const Profile = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value ?? ''
     }));
   };
 
   const handleIncomeChange = (index, value) => {
     const newIncome = [...formData.monthlyIncome];
-    newIncome[index] = value;
+    newIncome[index] = value ?? '';
     setFormData(prev => ({
       ...prev,
       monthlyIncome: newIncome
@@ -68,12 +68,10 @@ const Profile = () => {
     setSuccess('');
 
     try {
-      // Save profile data
       await axios.post('http://localhost:5000/api/profile', formData);
-      
-      // Calculate credit score
-      const scoreResponse = await axios.post('http://localhost:5000/api/score/calculate', formData);
-      
+
+      await axios.post('http://localhost:5000/api/score/calculate', formData);
+
       setSuccess('Profile saved and credit score calculated!');
       setTimeout(() => {
         navigate('/dashboard');
@@ -102,13 +100,11 @@ const Profile = () => {
               <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Age
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
                   <input
                     type="number"
                     name="age"
-                    value={formData.age}
+                    value={formData.age ?? ''}
                     onChange={handleChange}
                     required
                     min="18"
@@ -117,12 +113,10 @@ const Profile = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Gender
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                   <select
                     name="gender"
-                    value={formData.gender}
+                    value={formData.gender ?? ''}
                     onChange={handleChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -134,13 +128,11 @@ const Profile = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Occupation
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
                   <input
                     type="text"
                     name="occupation"
-                    value={formData.occupation}
+                    value={formData.occupation ?? ''}
                     onChange={handleChange}
                     required
                     placeholder="e.g., Software Engineer"
@@ -156,12 +148,10 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {months.map((month, index) => (
                   <div key={index}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {month}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{month}</label>
                     <input
                       type="number"
-                      value={formData.monthlyIncome[index]}
+                      value={formData.monthlyIncome[index] ?? ''}
                       onChange={(e) => handleIncomeChange(index, e.target.value)}
                       required
                       min="0"
@@ -177,51 +167,23 @@ const Profile = () => {
             <div className="border-b pb-6">
               <h3 className="text-lg font-semibold mb-4">Payment History</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Rent Payment
-                  </label>
-                  <select
-                    name="rentPayment"
-                    value={formData.rentPayment}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="on-time">On Time</option>
-                    <option value="late">Late</option>
-                    <option value="na">N/A</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Utility Payment 1
-                  </label>
-                  <select
-                    name="utility1Payment"
-                    value={formData.utility1Payment}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="on-time">On Time</option>
-                    <option value="late">Late</option>
-                    <option value="na">N/A</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Utility Payment 2
-                  </label>
-                  <select
-                    name="utility2Payment"
-                    value={formData.utility2Payment}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="on-time">On Time</option>
-                    <option value="late">Late</option>
-                    <option value="na">N/A</option>
-                  </select>
-                </div>
+                {['rentPayment','utility1Payment','utility2Payment'].map((field, i) => (
+                  <div key={field}>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {['Rent Payment','Utility Payment 1','Utility Payment 2'][i]}
+                    </label>
+                    <select
+                      name={field}
+                      value={formData[field] ?? 'on-time'}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="on-time">On Time</option>
+                      <option value="late">Late</option>
+                      <option value="na">N/A</option>
+                    </select>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -230,12 +192,10 @@ const Profile = () => {
               <h3 className="text-lg font-semibold mb-4">Education Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Education Level
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Education Level</label>
                   <select
                     name="educationLevel"
-                    value={formData.educationLevel}
+                    value={formData.educationLevel ?? ''}
                     onChange={handleChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -249,13 +209,11 @@ const Profile = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Field of Study
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
                   <input
                     type="text"
                     name="fieldOfStudy"
-                    value={formData.fieldOfStudy}
+                    value={formData.fieldOfStudy ?? ''}
                     onChange={handleChange}
                     placeholder="e.g., Computer Science"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -264,19 +222,13 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Error and Success Messages */}
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-800">{error}</div>
-              </div>
+              <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">{error}</div>
             )}
             {success && (
-              <div className="rounded-md bg-green-50 p-4">
-                <div className="text-sm text-green-800">{success}</div>
-              </div>
+              <div className="rounded-md bg-green-50 p-4 text-sm text-green-800">{success}</div>
             )}
 
-            {/* Submit Button */}
             <div className="flex justify-end">
               <button
                 type="submit"
