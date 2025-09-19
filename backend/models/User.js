@@ -19,13 +19,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+
   profile: {
+    userType: {
+      type: String,
+      enum: ['working', 'student'],
+      default: 'working'
+    },
     age: Number,
     gender: {
       type: String,
       enum: ['male', 'female', 'other']
     },
     occupation: String,
+
+    // Working fields
     monthlyIncome: [Number],
     rentPayment: {
       type: String,
@@ -42,12 +50,24 @@ const userSchema = new mongoose.Schema({
       enum: ['on-time', 'late', 'na'],
       default: 'on-time'
     },
+
+    // Common fields
     educationLevel: {
       type: String,
       enum: ['high-school', 'bachelors', 'masters', 'phd', 'other']
     },
-    fieldOfStudy: String
+    fieldOfStudy: String,
+
+    // Student fields
+    gpa: Number,
+    collegeScore: Number,
+    cosignerIncome: Number,
+    scholarship: {
+      type: Boolean,
+      default: false
+    }
   },
+
   creditScore: {
     score: Number,
     riskBand: {
@@ -63,6 +83,7 @@ const userSchema = new mongoose.Schema({
     explanation: String,
     calculatedAt: Date
   },
+
   createdAt: {
     type: Date,
     default: Date.now
@@ -73,30 +94,24 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Hash password before saving
+// hash password
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
-// Compare password method
+// compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Update timestamp
+// update timestamp
 userSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
 });
 
 const User = mongoose.model('User', userSchema);
-
 export default User;

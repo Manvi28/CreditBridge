@@ -1,157 +1,99 @@
-/* ==== Global Reset ==== */
-* {
-  box-sizing: border-box;
+/* Profile.css */
+
+.profile-page {
+  background: #f9fafb;
+  min-height: 100vh;
+  padding: 2rem 1rem;
 }
 
-body {
-  background: linear-gradient(135deg, #f5f7ff, #ffffff);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-/* ==== Page Wrapper ==== */
-.min-h-screen {
-  padding: 3rem 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-/* ==== Card Container ==== */
-.max-w-4xl {
-  background: #ffffff;
-  border-radius: 1.25rem;
-  padding: 2.5rem 2rem;
-  width: 100%;
+.profile-container {
   max-width: 900px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
-  overflow: hidden; /* ensures children don't spill */
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* ==== Section Headings ==== */
-h2 {
-  color: #1e1b4b;
-  font-size: 2.2rem;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 2.5rem;
+.profile-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
 }
 
-h3 {
-  color: #111827;
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 2px solid #e5e7eb;
+.profile-container p {
+  color: #555;
+  margin-bottom: 2rem;
 }
 
-/* ==== Section Group ==== */
-.border-b {
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 2.5rem;
-  padding-bottom: 2.5rem;
+.profile-form .form-section {
+  margin-bottom: 2rem;
 }
 
-/* ==== Grid Layouts ==== */
-.grid {
-  display: grid;
-  gap: 1.25rem;
-  width: 100%;
+.profile-form .form-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #333;
 }
 
-.md\:grid-cols-3 {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.md\:grid-cols-2 {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
-
-/* ==== Labels ==== */
-label {
-  font-size: 0.95rem;
-  color: #374151;
-  font-weight: 500;
+.profile-form label {
   display: block;
   margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  color: #333;
 }
 
-/* ==== Inputs & Selects ==== */
-input[type="text"],
-input[type="number"],
-select {
-  display: block;
+.profile-form input,
+.profile-form select {
   width: 100%;
-  padding: 0.9rem 1rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 0.6rem;
-  background: #f9fafb;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   font-size: 0.95rem;
-  line-height: 1.4;
-  transition: all 0.2s ease;
 }
 
-input:focus,
-select:focus {
-  background: #ffffff;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-  outline: none;
+.profile-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  gap: 1rem;
 }
 
-/* ==== Submit Button ==== */
-button[type="submit"] {
-  display: inline-block;
-  width: 100%;
-  padding: 1rem;
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-actions {
+  text-align: right;
+}
+
+.form-actions button {
   background: #4f46e5;
-  color: #ffffff;
-  font-weight: 600;
+  color: #fff;
   border: none;
-  border-radius: 0.6rem;
-  font-size: 1.05rem;
-  transition: all 0.25s ease;
-  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
 }
 
-button[type="submit"]:hover {
+.form-actions button:hover {
   background: #4338ca;
-  transform: translateY(-2px);
 }
 
-button[type="submit"]:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ==== Alerts ==== */
-.error-message,
-.success-message {
-  padding: 1rem 1.25rem;
-  border-radius: 0.6rem;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-}
-
-.error-message {
+.error-msg {
   background: #fee2e2;
   color: #b91c1c;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
 }
 
-.success-message {
+.success-msg {
   background: #dcfce7;
   color: #166534;
-}
-
-/* ==== Responsive Fix ==== */
-@media (max-width: 640px) {
-  .max-w-4xl {
-    padding: 2rem 1.5rem;
-  }
-  .grid {
-    gap: 1rem;
-  }
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
 }

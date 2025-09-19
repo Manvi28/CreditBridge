@@ -1,128 +1,146 @@
-import pandas as pd
-import numpy as np
+# generate_data.py
+import csv
 import random
+import numpy as np
+import pandas as pd
 
-def generate_synthetic_data(n_samples=5000):
-    """Generate synthetic credit scoring data"""
-    
-    data = []
-    
-    for _ in range(n_samples):
-        # Age (18-70)
-        age = random.randint(18, 70)
-        
-        # Gender
-        gender = random.choice(['male', 'female', 'other'])
-        
-        # Education Level
-        education_level = random.choice(['high-school', 'bachelors', 'masters', 'phd', 'other'])
-        education_score = {
-            'phd': 4,
-            'masters': 3,
-            'bachelors': 2,
-            'high-school': 1,
-            'other': 0
-        }[education_level]
-        
-        # Occupation (simplified categories)
-        occupation_categories = {
-            'professional': 3,
-            'skilled': 2,
-            'semi-skilled': 1,
-            'entry-level': 0
-        }
-        occupation_type = random.choice(list(occupation_categories.keys()))
-        occupation_score = occupation_categories[occupation_type]
-        
-        # Monthly Income (last 6 months)
-        base_income = random.uniform(1000, 10000)
-        income_variation = random.uniform(0.8, 1.2)
-        monthly_income = [
-            base_income * random.uniform(0.9, 1.1) * income_variation 
-            for _ in range(6)
-        ]
-        avg_income = np.mean(monthly_income)
-        income_stability = 1 - (np.std(monthly_income) / avg_income if avg_income > 0 else 1)
-        
-        # Payment History
-        payment_reliability = random.uniform(0, 1)
-        rent_payment = 1 if payment_reliability > 0.3 else 0  # 1 = on-time, 0 = late
-        utility1_payment = 1 if payment_reliability > 0.25 else 0
-        utility2_payment = 1 if payment_reliability > 0.25 else 0
-        
-        # Calculate synthetic credit score (0-100)
-        # Weighted scoring formula
-        score = 0
-        
-        # Age factor (5%)
-        age_factor = min(1, (age - 18) / 30) * 5
-        score += age_factor
-        
-        # Education factor (15%)
-        education_factor = (education_score / 4) * 15
-        score += education_factor
-        
-        # Occupation factor (10%)
-        occupation_factor = (occupation_score / 3) * 10
-        score += occupation_factor
-        
-        # Income factor (30%)
-        income_factor = min(1, avg_income / 8000) * 30
-        score += income_factor
-        
-        # Income stability factor (10%)
-        stability_factor = income_stability * 10
-        score += stability_factor
-        
-        # Payment history factor (30%)
-        payment_factor = ((rent_payment + utility1_payment + utility2_payment) / 3) * 30
-        score += payment_factor
-        
-        # Add some random noise
-        score += random.uniform(-5, 5)
-        
-        # Ensure score is within bounds
-        score = max(0, min(100, score))
-        
-        # Create record
-        record = {
-            'age': age,
-            'gender': gender,
-            'education_level': education_level,
-            'occupation_type': occupation_type,
-            'avg_income': avg_income,
-            'income_stability': income_stability,
-            'income_month_1': monthly_income[0],
-            'income_month_2': monthly_income[1],
-            'income_month_3': monthly_income[2],
-            'income_month_4': monthly_income[3],
-            'income_month_5': monthly_income[4],
-            'income_month_6': monthly_income[5],
-            'rent_payment': rent_payment,
-            'utility1_payment': utility1_payment,
-            'utility2_payment': utility2_payment,
-            'credit_score': round(score)
-        }
-        
-        data.append(record)
-    
-    return pd.DataFrame(data)
+def random_college_score(name=None):
+    # simple mapping probability; in real world you'd map known colleges to tiers
+    return random.randint(40, 95)
 
-if __name__ == "__main__":
-    # Generate synthetic data
-    df = generate_synthetic_data(5000)
-    
-    # Save to CSV
-    df.to_csv('synthetic_credit_data.csv', index=False)
-    
-    print("Synthetic data generated successfully!")
-    print(f"Shape: {df.shape}")
-    print(f"\nFirst few rows:")
-    print(df.head())
-    print(f"\nCredit score statistics:")
-    print(df['credit_score'].describe())
-    print(f"\nDistribution of risk bands:")
-    df['risk_band'] = pd.cut(df['credit_score'], 
-                             bins=[0, 40, 70, 100], 
-                             labels=['High', 'Medium', 'Low'])
-    print(df['risk_band'].value_counts())
+def gen_working_row():
+    # generate 6 months income between 10000 - 120000 (INR) as realistic spread
+    monthly = [round(random.uniform(10000, 120000), 2) for _ in range(6)]
+    avg_income = np.mean(monthly)
+    # payment behavior: probability to be on-time increases with income
+    pay_prob = min(0.95, 0.3 + (avg_income / 120000))
+    def pay():
+        r = random.random()
+        if r < pay_prob: return 'on-time'
+        if r < pay_prob + 0.15: return 'late'
+        return 'na'
+    row = {
+        'userType': 'working',
+        'age': random.randint(22, 60),
+        'gender': random.choice(['male','female','other']),
+        'educationLevel': random.choices(['high-school','bachelors','masters','phd','other'], [0.05,0.6,0.25,0.05,0.05])[0],
+        'occupation': random.choice(['software engineer','teacher','analyst','manager','sales','technician','clerk']),
+        'monthlyIncome': monthly,
+        'rentPayment': pay(),
+        'utility1Payment': pay(),
+        'utility2Payment': pay(),
+        'gpa': None,
+        'collegeScore': None,
+        'cosignerIncome': None,
+        'scholarship': None
+    }
+    return row
+
+def gen_student_row():
+    # students: optional part-time income 0-5000
+    monthly = [round(random.uniform(0, 5000), 2) if random.random() < 0.4 else 0.0 for _ in range(6)]
+    gpa = round(random.uniform(5.0, 10.0), 2)  # 0-10 scale
+    collegeScore = random_college_score()
+    cosignerIncome = round(random.uniform(0, 150000), 2) if random.random() < 0.3 else 0.0
+    scholarship = random.choice([0,1]) if random.random() < 0.25 else 0
+    row = {
+        'userType': 'student',
+        'age': random.randint(17, 30),
+        'gender': random.choice(['male','female','other']),
+        'educationLevel': random.choices(['high-school','bachelors','masters','other'], [0.1,0.7,0.05,0.15])[0],
+        'occupation': 'student',
+        'monthlyIncome': monthly,
+        'rentPayment': random.choice(['on-time','late','na']),
+        'utility1Payment': random.choice(['on-time','late','na']),
+        'utility2Payment': random.choice(['on-time','late','na']),
+        'gpa': gpa,
+        'collegeScore': collegeScore,
+        'cosignerIncome': cosignerIncome,
+        'scholarship': scholarship
+    }
+    return row
+
+def build_dataset(total=50000, students_ratio=0.5):
+    rows = []
+    students = int(total * students_ratio)
+    workers = total - students
+    for _ in range(workers):
+        rows.append(gen_working_row())
+    for _ in range(students):
+        rows.append(gen_student_row())
+    random.shuffle(rows)
+    return rows
+
+def synthesize_score(row):
+    # heuristic function to create a realistic credit score for synthetic label
+    base = 50
+    # common adjustments
+    edu_map = {'other': -3, 'high-school': -1, 'bachelors': 3, 'masters': 6, 'phd': 8}
+    base += edu_map.get(row['educationLevel'], 0)
+    # working
+    if row['userType'] == 'working':
+        incomes = row['monthlyIncome']
+        avg_income = np.mean(incomes) if incomes else 0
+        stability = 1 - (np.std(incomes) / avg_income) if avg_income > 0 else 0
+        # payment score
+        payment_map = {'on-time': 1, 'na': 0.5, 'late': 0}
+        pscore = (payment_map[row['rentPayment']] + payment_map[row['utility1Payment']] + payment_map[row['utility2Payment']]) / 3
+        base += (np.clip(avg_income/20000, 0, 30)) * 0.6   # income influence
+        base += stability * 10
+        base += (pscore - 0.5) * 40  # payment is strong signal
+    else:  # student
+        gpa = row.get('gpa') or 6.0
+        college = row.get('collegeScore') or 50
+        cosigner = row.get('cosignerIncome') or 0
+        scholarship = row.get('scholarship') or 0
+        avg_part = np.mean(row['monthlyIncome']) if row['monthlyIncome'] else 0
+        base += (gpa - 5.0) * 5        # stronger GPA helps
+        base += (college - 50) * 0.2
+        base += np.clip(cosigner/30000, 0, 10)
+        base += scholarship * 5
+        base += np.clip(avg_part/2000, 0, 5)
+    # add small noise
+    score = base + random.gauss(0, 5)
+    return int(max(0, min(100, round(score))))
+
+def export_csv(rows, filename='credit_data.csv'):
+    # flatten monthlyIncome into columns
+    cols = [
+        'userType','age','gender','educationLevel','occupation',
+        'income_month_1','income_month_2','income_month_3','income_month_4','income_month_5','income_month_6',
+        'rentPayment','utility1Payment','utility2Payment',
+        'gpa','collegeScore','cosignerIncome','scholarship','creditScore'
+    ]
+    with open(filename, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=cols)
+        writer.writeheader()
+        for r in rows:
+            out = {
+                'userType': r['userType'],
+                'age': r['age'],
+                'gender': r['gender'],
+                'educationLevel': r['educationLevel'],
+                'occupation': r['occupation'],
+                'income_month_1': r['monthlyIncome'][0] if len(r['monthlyIncome'])>0 else 0,
+                'income_month_2': r['monthlyIncome'][1] if len(r['monthlyIncome'])>1 else 0,
+                'income_month_3': r['monthlyIncome'][2] if len(r['monthlyIncome'])>2 else 0,
+                'income_month_4': r['monthlyIncome'][3] if len(r['monthlyIncome'])>3 else 0,
+                'income_month_5': r['monthlyIncome'][4] if len(r['monthlyIncome'])>4 else 0,
+                'income_month_6': r['monthlyIncome'][5] if len(r['monthlyIncome'])>5 else 0,
+                'rentPayment': r['rentPayment'],
+                'utility1Payment': r['utility1Payment'],
+                'utility2Payment': r['utility2Payment'],
+                'gpa': r['gpa'] if r['gpa'] is not None else '',
+                'collegeScore': r['collegeScore'] if r['collegeScore'] is not None else '',
+                'cosignerIncome': r['cosignerIncome'] if r['cosignerIncome'] is not None else '',
+                'scholarship': r['scholarship'] if r['scholarship'] is not None else '',
+            }
+            out['creditScore'] = synthesize_score(r)
+            writer.writerow(out)
+    print(f"Saved {filename}")
+
+if __name__ == '__main__':
+    print("Generating synthetic dataset (50k rows)... this may take a minute.")
+    rows = build_dataset(total=50000, students_ratio=0.5)
+    export_csv(rows)
+    print("Done.")

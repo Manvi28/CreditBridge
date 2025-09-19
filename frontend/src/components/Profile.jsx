@@ -5,6 +5,7 @@ import axios from 'axios';
 import './Profile.css';
 
 const defaultForm = {
+  userType: 'working',
   age: '',
   gender: '',
   occupation: '',
@@ -13,7 +14,11 @@ const defaultForm = {
   utility1Payment: 'on-time',
   utility2Payment: 'on-time',
   educationLevel: '',
-  fieldOfStudy: ''
+  fieldOfStudy: '',
+  gpa: '',
+  collegeScore: '',
+  cosignerIncome: '',
+  scholarship: false
 };
 
 const Profile = () => {
@@ -22,7 +27,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
   const [formData, setFormData] = useState(defaultForm);
 
   useEffect(() => {
@@ -45,10 +49,10 @@ const Profile = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value ?? ''
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -69,13 +73,9 @@ const Profile = () => {
 
     try {
       await axios.post('http://localhost:5000/api/profile', formData);
-
       await axios.post('http://localhost:5000/api/score/calculate', formData);
-
       setSuccess('Profile saved and credit score calculated!');
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1500);
+      setTimeout(() => navigate('/dashboard'), 1500);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to save profile');
     } finally {
@@ -83,163 +83,144 @@ const Profile = () => {
     }
   };
 
-  const months = ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'];
+  const months = ['Month 1','Month 2','Month 3','Month 4','Month 5','Month 6'];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6">Complete Your Profile</h2>
-          <p className="text-gray-600 mb-6">
-            Please provide the following information to calculate your credit score
-          </p>
+    <div className="profile-page">
+      <div className="profile-container">
+        <h2>Complete Your Profile</h2>
+        <p>Please provide the following information to calculate your credit score</p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Profile */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form onSubmit={handleSubmit} className="profile-form">
+
+          {/* User Type */}
+          <div className="form-section">
+            <label>User Type</label>
+            <select
+              name="userType"
+              value={formData.userType}
+              onChange={handleChange}
+            >
+              <option value="working">Working</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+
+          {/* Basic Info */}
+          <div className="form-section">
+            <h3>Basic Information</h3>
+            <div className="form-grid">
+              <div>
+                <label>Age</label>
+                <input type="number" name="age" value={formData.age} onChange={handleChange} required min="18" max="100"/>
+              </div>
+              <div>
+                <label>Gender</label>
+                <select name="gender" value={formData.gender} onChange={handleChange} required>
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              {formData.userType === 'working' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
-                  <input
-                    type="number"
-                    name="age"
-                    value={formData.age ?? ''}
-                    onChange={handleChange}
-                    required
-                    min="18"
-                    max="100"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
+                  <label>Occupation</label>
+                  <input type="text" name="occupation" value={formData.occupation} onChange={handleChange} placeholder="e.g. Software Engineer"/>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Working Fields */}
+          {formData.userType === 'working' && (
+            <>
+              <div className="form-section">
+                <h3>Monthly Income (Last 6 Months)</h3>
+                <div className="form-grid">
+                  {months.map((m, i) => (
+                    <div key={i}>
+                      <label>{m}</label>
+                      <input type="number" value={formData.monthlyIncome[i]} onChange={(e)=>handleIncomeChange(i,e.target.value)} min="0"/>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3>Payment History</h3>
+                <div className="form-grid">
+                  {['rentPayment','utility1Payment','utility2Payment'].map((f,i)=>(
+                    <div key={f}>
+                      <label>{['Rent Payment','Utility 1','Utility 2'][i]}</label>
+                      <select name={f} value={formData[f]} onChange={handleChange}>
+                        <option value="on-time">On Time</option>
+                        <option value="late">Late</option>
+                        <option value="na">N/A</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Student Fields */}
+          {formData.userType === 'student' && (
+            <div className="form-section">
+              <h3>Student Information</h3>
+              <div className="form-grid">
+                <div>
+                  <label>GPA</label>
+                  <input type="number" step="0.01" name="gpa" value={formData.gpa} onChange={handleChange}/>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                  <select
-                    name="gender"
-                    value={formData.gender ?? ''}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <label>College Score</label>
+                  <input type="number" name="collegeScore" value={formData.collegeScore} onChange={handleChange}/>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
-                  <input
-                    type="text"
-                    name="occupation"
-                    value={formData.occupation ?? ''}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g., Software Engineer"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
+                  <label>Cosigner Income</label>
+                  <input type="number" name="cosignerIncome" value={formData.cosignerIncome} onChange={handleChange}/>
+                </div>
+                <div className="checkbox-field">
+                  <input type="checkbox" name="scholarship" checked={formData.scholarship} onChange={handleChange}/>
+                  <label>Has Scholarship</label>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Monthly Income */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold mb-4">Monthly Income (Last 6 Months)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {months.map((month, index) => (
-                  <div key={index}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{month}</label>
-                    <input
-                      type="number"
-                      value={formData.monthlyIncome[index] ?? ''}
-                      onChange={(e) => handleIncomeChange(index, e.target.value)}
-                      required
-                      min="0"
-                      placeholder="Amount in $"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                ))}
+          {/* Education */}
+          <div className="form-section">
+            <h3>Education</h3>
+            <div className="form-grid">
+              <div>
+                <label>Education Level</label>
+                <select name="educationLevel" value={formData.educationLevel} onChange={handleChange}>
+                  <option value="">Select</option>
+                  <option value="high-school">High School</option>
+                  <option value="bachelors">Bachelor's</option>
+                  <option value="masters">Master's</option>
+                  <option value="phd">PhD</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Field of Study</label>
+                <input type="text" name="fieldOfStudy" value={formData.fieldOfStudy} onChange={handleChange}/>
               </div>
             </div>
+          </div>
 
-            {/* Payment History */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold mb-4">Payment History</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {['rentPayment','utility1Payment','utility2Payment'].map((field, i) => (
-                  <div key={field}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {['Rent Payment','Utility Payment 1','Utility Payment 2'][i]}
-                    </label>
-                    <select
-                      name={field}
-                      value={formData[field] ?? 'on-time'}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                      <option value="on-time">On Time</option>
-                      <option value="late">Late</option>
-                      <option value="na">N/A</option>
-                    </select>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {error && <div className="error-msg">{error}</div>}
+          {success && <div className="success-msg">{success}</div>}
 
-            {/* Education */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold mb-4">Education Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Education Level</label>
-                  <select
-                    name="educationLevel"
-                    value={formData.educationLevel ?? ''}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="">Select</option>
-                    <option value="high-school">High School</option>
-                    <option value="bachelors">Bachelor's Degree</option>
-                    <option value="masters">Master's Degree</option>
-                    <option value="phd">PhD</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
-                  <input
-                    type="text"
-                    name="fieldOfStudy"
-                    value={formData.fieldOfStudy ?? ''}
-                    onChange={handleChange}
-                    placeholder="e.g., Computer Science"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {error && (
-              <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">{error}</div>
-            )}
-            {success && (
-              <div className="rounded-md bg-green-50 p-4 text-sm text-green-800">{success}</div>
-            )}
-
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-              >
-                {loading ? 'Calculating...' : 'Save & Calculate Score'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="form-actions">
+            <button type="submit" disabled={loading}>
+              {loading ? 'Calculating...' : 'Save & Calculate Score'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

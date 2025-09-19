@@ -4,14 +4,13 @@ import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get profile
+// GET profile
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('profile');
     if (!user || !user.profile) {
       return res.status(404).json({ message: 'Profile not found' });
     }
-    
     res.json(user.profile);
   } catch (error) {
     console.error('Get profile error:', error);
@@ -19,19 +18,20 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// Update profile
+// POST (create/update) profile
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const profileData = req.body;
-    
+
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
-    // Update profile fields
+
+    // Update profile
     user.profile = {
       ...user.profile,
+      userType: profileData.userType || 'working',
       age: profileData.age,
       gender: profileData.gender,
       occupation: profileData.occupation,
@@ -40,11 +40,15 @@ router.post('/', authMiddleware, async (req, res) => {
       utility1Payment: profileData.utility1Payment,
       utility2Payment: profileData.utility2Payment,
       educationLevel: profileData.educationLevel,
-      fieldOfStudy: profileData.fieldOfStudy
+      fieldOfStudy: profileData.fieldOfStudy,
+      // student fields (may be null for working users)
+      gpa: profileData.gpa || null,
+      collegeScore: profileData.collegeScore || null,
+      cosignerIncome: profileData.cosignerIncome || null,
+      scholarship: profileData.scholarship || false
     };
-    
+
     await user.save();
-    
     res.json({ message: 'Profile updated successfully', profile: user.profile });
   } catch (error) {
     console.error('Update profile error:', error);

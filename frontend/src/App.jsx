@@ -6,6 +6,7 @@ import Profile from './components/Profile';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Landing from './pages/Landing'; // ⬅️ import your new Landing page
+import AdminDashboard from './components/AdminDashboard';
 import './index.css';
 
 function App() {
@@ -34,6 +35,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <PrivateRoute>
+                <AdminDashboard />
               </PrivateRoute>
             }
           />

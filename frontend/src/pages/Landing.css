@@ -1,5 +1,5 @@
 .hero {
-  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  background: linear-gradient(135deg, #b3b0ef, #4338ca);
   color: white;
   text-align: center;
   padding: 8rem 2rem;
@@ -8,6 +8,7 @@
 .hero-content h1 {
   font-size: 3rem;
   margin-bottom: 1.2rem;
+  color: #ede5e5;
 }
 
 .hero-content p {
@@ -15,6 +16,7 @@
   margin-bottom: 2rem;
   max-width: 600px;
   margin-inline: auto;
+  color: #000;
 }
 
 .hero-btn {

@@ -1,6 +1,6 @@
-/* Dashboard.css */
-
-/* Layout */
+/* =========================
+   General Layout & Typography
+   ========================= */
 .min-h-screen { min-height: 100vh; }
 .flex { display: flex; }
 .items-center { align-items: center; }
@@ -57,7 +57,7 @@
 /* Max widths */
 .max-w-7xl { max-width: 80rem; margin-left: auto; margin-right: auto; }
 
-/* Text colors for score (JS logic applies them) */
+/* Score Colors */
 .text-green-600 { color: #16A34A; }
 .text-yellow-600 { color: #CA8A04; }
 .text-red-600 { color: #DC2626; }
@@ -70,3 +70,328 @@
 .text-red-800 { color: #991B1B; }
 .bg-gray-100 { background-color: #F3F4F6; }
 .text-gray-800 { color: #1F2937; }
+
+/* ==============================
+   Sidebar Styles (Wider + Icons)
+   ============================== */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.sidebar {
+  width: 260px; /* wider sidebar */
+  background-color: #fff;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-top {
+  padding: 25px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.profile-name {
+  font-weight: 700;
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.profile-risk {
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  padding-top: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-btn {
+  padding: 12px 25px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: #4F46E5;
+}
+
+.nav-btn:hover {
+  background-color: #eef2ff;
+  color: #4F46E5;
+}
+
+.nav-btn:hover svg {
+  fill: #1E40AF;
+}
+
+.active-tab {
+  background-color: #e0e7ff;
+  color: #4F46E5;
+  border-left: 4px solid #4F46E5;
+}
+
+.active-tab svg {
+  fill: #1E40AF;
+}
+
+.sidebar-bottom {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recalc-btn {
+  padding: 10px;
+  background-color: #4F46E5;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+.recalc-btn:hover {
+  background-color: #4338ca;
+}
+
+.logout-btn {
+  padding: 10px;
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #d1d1d1;
+}
+
+/* ==============================
+   Main Panel Styles
+   ============================== */
+.main-panel {
+  flex-grow: 1;
+  padding: 20px;
+  font-size: 14px; /* smaller font size */
+  line-height: 1.5;
+}
+
+/* Score Cards */
+.score-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.score-number {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.risk-band {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+/* Top Factors */
+.top-factors {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.factor-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.factor-impact.impact-positive {
+  background-color: #dcfce7;
+  color: #16a34a;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+.factor-impact.impact-negative {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   Responsive Media Queries
+   ========================= */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px 0;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 10px;
+    padding: 0;
+  }
+  .nav-btn {
+    padding: 10px 12px;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  .sidebar-top, .sidebar-bottom {
+    display: none; /* hide extra elements on small screens */
+  }
+  .main-panel {
+    padding: 15px;
+  }
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-header {
+  text-align: center;
+}
+
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.profile-details {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.loans-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loan-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.banking-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.bank-info {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  gap: 20px;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-table th, .transaction-table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.transaction-table th {
+  background-color: #f3f4f6;
+}
+.cards-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card-info {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
